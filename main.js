@@ -163,7 +163,7 @@ fetch("words.txt")
             }
             UI.appendChild(rowElement);
         }
-        addEventListener('keyup', e => {
+        if (typeof screen.orientation !== 'undefined') addEventListener('keyup', e => {
             if (e.key === "Enter") {
                 game.enter()
             }
@@ -187,10 +187,13 @@ fetch("words.txt")
                 keytile.className = "keytile";
                 if (c == "#") {
                     c = "Enter";
+                    keytile.style.width = "30pt";
                     keytile.addEventListener("click", () => game.enter());
                 }
                 else if (c == '-') {
                     keytile.addEventListener("click", () => game.backspace());
+                    keytile.style.width = "20pt";
+                    keytile.style.fontSize = "15pt";
                     fetch('backspace.svg')
                         .then(r => r.text())
                         .then(text => {

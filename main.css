@@ -36,8 +36,8 @@ body {
 }
 
 .tilerow {
-    width: 14em;
-    height: 3em;
+    width: 180pt;
+    height: 35pt;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -47,15 +47,16 @@ body {
 .tile {
     width: 30pt;
     height: 30pt;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
     background-color: rgb(63, 63, 63);
     font-weight: 600;
-    font-size: 24pt;
+    font-size: 20pt;
 }
 
 #keyboard{
-    width:20em;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -70,9 +71,10 @@ body {
 .keytile {
     margin:3pt;
     display: flex;
-    padding: 0 10pt;
+    padding: 0 5pt;
+    width:10pt;
     height:30pt;
-    font-size: 14pt;
+    font-size: 11pt;
     font-weight: 600;
     justify-content: center;
     align-items: center;
