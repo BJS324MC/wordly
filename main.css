@@ -1,0 +1,81 @@
+@font-face {
+    font-family: DM Sans;
+    src: url("./DMSans.ttf");
+}
+
+body {
+    font-family: DM Sans;
+    background-color: rgb(28, 28, 28);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0;
+}
+
+#title {
+    color: white;
+    font-size: 30pt;
+    margin: 7pt;
+}
+
+#reset {
+    font-size: 20pt;
+    margin-top: 5pt;
+    padding: 0 10pt;
+    user-select: none;
+    background-color: rgb(61, 64, 64);
+    color: white;
+}
+
+#board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tilerow {
+    width: 14em;
+    height: 3em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.tile {
+    width: 30pt;
+    height: 30pt;
+    text-align: center;
+    color: white;
+    background-color: rgb(63, 63, 63);
+    font-weight: 600;
+    font-size: 24pt;
+}
+
+#keyboard{
+    width:20em;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.keyrow{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.keytile {
+    margin:3pt;
+    display: flex;
+    padding: 0 10pt;
+    height:30pt;
+    font-size: 14pt;
+    font-weight: 600;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: #616161ff;
+}
