@@ -2,7 +2,7 @@ class Game {
     constructor(words) {
         this.words = words
         this.randomMainWord()
-        this.isDone = false;
+        this.finishState = 0;
         this.cursor = [0, 0]
         this.board = Array(6).fill(0).map(b => Array(5).fill(0).map(a => new Tile()));
         this.colours = {
@@ -17,7 +17,10 @@ class Game {
             2: "#89ff35ff",
             3: "#23c530ff"
         }
-        this.keyStates = {}
+        this.winMessages = ["Nice job","Well done","Excellent","Splendid","Marvellous",":)"];
+        this.keyStates = {};
+        this.popUp = alert;
+        this.resetButton = null;
     }
     countLetters(word) {
         let letterCount = {};
@@ -32,6 +35,8 @@ class Game {
         return letterCount
     }
     newBoard() {
+        this.finishState = 0;
+        if(this.resetButton) this.resetButton.classList.remove("rainbow");
         for (let row of this.board) {
             for (let tile of row) {
                 tile.content = "";
@@ -58,6 +63,7 @@ class Game {
         }
     }
     addLetter(letter) {
+        if(this.finishState !== 0) return false;
         let [row, col] = this.cursor;
         if (col > this.board[0].length - 1) return false;
         this.board[row][col].content = letter;
@@ -69,20 +75,25 @@ class Game {
         tile.element.style.backgroundColor = this.colours[tile.state];
     }
     backspace() {
+        if(this.finishState !== 0) return false;
         let [row, col] = this.cursor;
         if (col < 1) return false;
         this.board[row][col - 1].content = ""
         this.cursor[1]--;
         this.updateTile(this.board[row][col - 1])
     }
+    isGuessed(){
+        return this.board[this.cursor[0]].every(tile => tile.state === 3);
+    }
     enter() {
+        if(this.finishState !== 0) return false;
         let entered = this.board[this.cursor[0]].map(a=>a.content).join('').trim();
         if(entered.length < this.board[this.cursor[0]].length){
-            alert("Word is too short.");
+            this.popUp("Word is too short.");
             return false;
         }
         else if(!this.words.includes(entered.toLowerCase())){
-            alert("Not in the word list.");
+            this.popUp("Not in the word list.");
             return false;
         }
         let repetition = this.countLetters(this.mainWord), letterBox = {};
@@ -117,14 +128,23 @@ class Game {
         })
         this.board[this.cursor[0]].forEach((tile, i) => {
             this.updateTile(tile);
-            let key = this.keyStates[tile.content]
-            key[0] = tile.state;
+            let key = this.keyStates[tile.content];
+            if(key[0] < tile.state) key[0] = tile.state;
             key[1].style.backgroundColor = this.keyColours[key[0]];
         });
-        this.cursor[0]++;
-        this.cursor[1] = 0;
-        if (this.cursor[0] > this.board.length - 1) {
-            this.isDone = true
+        if(this.isGuessed()){
+            this.finishState = 1;
+            if(this.resetButton) this.resetButton.classList.add("rainbow");
+            this.popUp(this.winMessages[Math.floor(Math.random()*this.winMessages.length)])
+        }
+        else{
+            this.cursor[0]++;
+            this.cursor[1] = 0;
+            if (this.cursor[0] > this.board.length - 1) {
+                this.finishState = -1;
+                if(this.resetButton) this.resetButton.classList.add("rainbow");
+                this.popUp(this.mainWord.join(""))
+            }
         }
     }
 }
@@ -152,8 +172,19 @@ fetch("words.txt")
         const UI = document.getElementById("board");
         const keyboard = document.getElementById("keyboard");
         const reset = document.getElementById("reset");
+        const popUp = document.getElementById("popup");
         const words = text.split("\n")
         const game = new Game(words);
+
+        function displayPopUp(text = ""){
+            popUp.innerText = text;
+            popUp.classList.remove("faded")
+            popUp.offsetHeight;
+            popUp.classList.add("faded")
+        }
+
+        game.popUp = displayPopUp;
+        game.resetButton = reset;
 
         for (let row of game.board) {
             let rowElement = document.createElement("div");

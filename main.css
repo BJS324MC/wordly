@@ -3,9 +3,53 @@
     src: url("./DMSans.ttf");
 }
 
-body {
+
+@keyframes fadeOut{
+    0%{
+        opacity: 0;
+    }
+    10%{
+        opacity: 1;
+    }
+    70%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+@keyframes rainbow{
+    0%{
+        background-color: hsl(0, 100%, 50%);
+    }
+    33%{
+        background-color: hsl(120, 100%, 50%);
+    }
+    66%{
+        background-color: hsl(240, 100%, 50%);
+    }
+    100%{
+        background-color: hsl(0, 100%, 50%);
+    }
+}
+
+.faded {
+    animation: fadeOut 2s ease-out;
+}
+
+.rainbow{
+    animation: rainbow 2s infinite;
+}
+
+body{
+    margin: 0;
+    padding: 0;
     font-family: DM Sans;
     background-color: rgb(28, 28, 28);
+}
+
+#game {
     display: flex;
     flex-direction: column;
     user-select: none;
@@ -80,4 +124,18 @@ body {
     align-items: center;
     color: white;
     background-color: #616161ff;
+}
+
+#popup {
+    position: absolute;
+    top:15%;
+    left:50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+    color: black;
+    border-radius: 10%;
+    padding:5pt 10pt;
+    background-color: rgba(190, 190, 190, 0.8);
 }
