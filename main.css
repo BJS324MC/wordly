@@ -187,15 +187,15 @@ body {
     font-size: 20pt;
 }
 
-@media (min-height: 800px) {
+@media (min-height: 700px) {
     .tilerow {
-        width: 250pt;
-        height: 50pt;
+        width: 210pt;
+        height: 42pt;
     }
 
     .tile {
-        width: 40pt;
-        height: 40pt;
+        width: 35pt;
+        height: 35pt;
     }
 }
 
@@ -209,17 +209,16 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    max-width: 300pt;
 }
 
 .keytile {
-    margin: 3pt;
+    margin: min(1vw, 3pt);
     display: flex;
-    padding: 10pt;
-    width: 5pt;
-    height: calc(30pt - 2vw);
-    ;
+    padding-top: 2.5vh;
+    padding-bottom: 2.5vh;
+    padding-left: min(2vw, 5pt);
+    padding-right: min(2vw, 5pt);
+    width: min(3vw,10pt);
     font-size: 11pt;
     font-weight: 900;
     justify-content: center;
