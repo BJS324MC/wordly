@@ -1,7 +1,8 @@
 class Game {
-    constructor(words) {
+    constructor(words, reset, popUp, keyStates) {
         this.words = words
         this.randomMainWord()
+        this.mainWord = "TRACE".split("");
         this.finishState = 0;
         this.cursor = [0, 0]
         this.board = Array(6).fill(0).map(b => Array(5).fill(0).map(a => new Tile()));
@@ -17,10 +18,10 @@ class Game {
             2: "#89ff35ff",
             3: "#23c530ff"
         }
-        this.winMessages = ["Nice job","Well done","Excellent","Splendid","Marvellous",":)"];
-        this.keyStates = {};
-        this.popUp = alert;
-        this.resetButton = null;
+        this.winMessages = ["Nice job", "Well done", "Excellent", "Splendid", "Marvellous", ":)"];
+        this.keyStates = keyStates;
+        this.popUp = popUp;
+        this.resetButton = reset;
     }
     countLetters(word) {
         let letterCount = {};
@@ -36,20 +37,54 @@ class Game {
     }
     newBoard() {
         this.finishState = 0;
-        if(this.resetButton) this.resetButton.classList.remove("rainbow");
+        if (this.resetButton) this.resetButton.classList.remove("rainbow");
         for (let row of this.board) {
             for (let tile of row) {
                 tile.content = "";
                 tile.state = 0;
                 this.updateTile(tile);
+                tile.element.classList.remove("flip");
+                tile.element.classList.remove("bounce");
             }
         }
-        for(let i in this.keyStates){
+        for (let i in this.keyStates) {
             let key = this.keyStates[i]
             key[0] = 0;
             key[1].style.backgroundColor = this.keyColours[key[0]];
         }
         this.cursor = [0, 0]
+    }
+    readSave(words) { // MAIN,word 1-5,,
+        this.newBoard();
+        this.mainWord = words[0].split('');
+        this.finishState = 2;
+        for (let i = 0; i < this.board.length; i++) {
+            if (!words[i + 1]) {
+                this.finishState = 0;
+                break;
+            }
+            for (let j = 0; j < this.board[0].length; j++)
+                this.board[i][j].content = words[i + 1][j];
+            this.processRow(i);
+            for (let j = 0; j < this.board[0].length; j++) {
+                let tile = this.board[i][j];
+                this.updateTile(tile);
+                tile.element.classList.add("flip");
+                let key = this.keyStates[tile.content];
+                if (key[0] < tile.state) key[0] = tile.state;
+                key[1].style.backgroundColor = this.keyColours[key[0]];
+            }
+            if (words[0] === words[i + 1]) {
+                this.resetButton.classList.add("rainbow");
+                this.finishState = 1;
+                break;
+            }
+            this.cursor[0]++;
+        }
+    }
+    save() {
+        let list = this.board.map(a => a.map(b => b.content).join('')).join(',');
+        localStorage.setItem("word_list", this.mainWord.join('') + ',' + list);
     }
     randomMainWord() {
         this.mainWord = this.words[Math.floor(Math.random() * this.words.length)].toUpperCase().split("")
@@ -63,11 +98,12 @@ class Game {
         }
     }
     addLetter(letter) {
-        if(this.finishState !== 0) return false;
-        let [row, col] = this.cursor;
+        if (this.finishState !== 0) return false;
+        let [row, col] = this.cursor, tile = this.board[row][col];
         if (col > this.board[0].length - 1) return false;
-        this.board[row][col].content = letter;
-        this.updateTile(this.board[row][col]);
+        tile.content = letter;
+        tile.element.classList.add("bulge");
+        this.updateTile(tile);
         this.cursor[1]++;
     }
     updateTile(tile) {
@@ -75,29 +111,21 @@ class Game {
         tile.element.style.backgroundColor = this.colours[tile.state];
     }
     backspace() {
-        if(this.finishState !== 0) return false;
+        if (this.finishState !== 0) return false;
         let [row, col] = this.cursor;
         if (col < 1) return false;
-        this.board[row][col - 1].content = ""
-        this.cursor[1]--;
-        this.updateTile(this.board[row][col - 1])
+        col = --this.cursor[1];
+        let tile = this.board[row][col];
+        tile.content = "";
+        tile.element.classList.remove("bulge");
+        this.updateTile(tile)
     }
-    isGuessed(){
+    isGuessed() {
         return this.board[this.cursor[0]].every(tile => tile.state === 3);
     }
-    enter() {
-        if(this.finishState !== 0) return false;
-        let entered = this.board[this.cursor[0]].map(a=>a.content).join('').trim();
-        if(entered.length < this.board[this.cursor[0]].length){
-            this.popUp("Word is too short.");
-            return false;
-        }
-        else if(!this.words.includes(entered.toLowerCase())){
-            this.popUp("Not in the word list.");
-            return false;
-        }
+    processRow(row) {
         let repetition = this.countLetters(this.mainWord), letterBox = {};
-        this.board[this.cursor[0]].forEach((tile, i) => {
+        this.board[row].forEach((tile, i) => {
             tile.changeState(1);
             let a = tile.content;
             this.mainWord.forEach((b, j) => {
@@ -126,26 +154,46 @@ class Game {
                 this.board[this.cursor[0]][index].changeState(1);
             }
         })
-        this.board[this.cursor[0]].forEach((tile, i) => {
-            this.updateTile(tile);
-            let key = this.keyStates[tile.content];
-            if(key[0] < tile.state) key[0] = tile.state;
-            key[1].style.backgroundColor = this.keyColours[key[0]];
-        });
-        if(this.isGuessed()){
-            this.finishState = 1;
-            if(this.resetButton) this.resetButton.classList.add("rainbow");
-            this.popUp(this.winMessages[Math.floor(Math.random()*this.winMessages.length)])
+    }
+    enter() {
+        if (this.finishState !== 0) return false;
+        let entered = this.board[this.cursor[0]].map(a => a.content).join('').trim();
+        if (entered.length < this.board[this.cursor[0]].length) {
+            this.popUp("Word is too short.");
+            return false;
         }
-        else{
+        else if (!this.words.includes(entered.toLowerCase())) {
+            this.popUp("Not in the word list.");
+            return false;
+        }
+        this.processRow(this.cursor[0]);
+        let green = this.isGuessed();
+        this.board[this.cursor[0]].forEach((tile, i) => {
+            setTimeout(() => {
+                this.updateTile(tile);
+                tile.offsetHeight;
+                if (green) tile.element.classList.add("bounce");
+                else tile.element.classList.add("flip");
+            }, 200 * i);
+            let key = this.keyStates[tile.content];
+            if (key[0] < tile.state) key[0] = tile.state;
+            setTimeout(() => key[1].style.backgroundColor = this.keyColours[key[0]], 1500);
+        });
+        if (green) {
+            this.finishState = 1;
+            if (this.resetButton) setTimeout(() => this.resetButton.classList.add("rainbow"), 1500);
+            setTimeout(() => this.popUp(this.winMessages[Math.floor(Math.random() * this.winMessages.length)]), 1500)
+        }
+        else {
             this.cursor[0]++;
             this.cursor[1] = 0;
             if (this.cursor[0] > this.board.length - 1) {
                 this.finishState = -1;
-                if(this.resetButton) this.resetButton.classList.add("rainbow");
-                this.popUp(this.mainWord.join(""))
+                if (this.resetButton) setTimeout(() => this.resetButton.classList.add("rainbow"), 1500);
+                setTimeout(() => this.popUp(this.mainWord.join("")), 1500)
             }
         }
+        this.save();
     }
 }
 
@@ -173,43 +221,19 @@ fetch("words.txt")
         const keyboard = document.getElementById("keyboard");
         const reset = document.getElementById("reset");
         const popUp = document.getElementById("popup");
-        const words = text.split("\n")
-        const game = new Game(words);
+        const words = text.split("\n");
 
-        function displayPopUp(text = ""){
+        function displayPopUp(text = "") {
             popUp.innerText = text;
             popUp.classList.remove("faded")
             popUp.offsetHeight;
             popUp.classList.add("faded")
         }
 
-        game.popUp = displayPopUp;
-        game.resetButton = reset;
+        let keyStates = {};
 
-        for (let row of game.board) {
-            let rowElement = document.createElement("div");
-            rowElement.className = "tilerow"
-            for (let tile of row) {
-                rowElement.appendChild(tile.element);
-            }
-            UI.appendChild(rowElement);
-        }
-        if (typeof screen.orientation !== 'undefined') addEventListener('keyup', e => {
-            if (e.key === "Enter") {
-                game.enter()
-            }
-            else if (e.key === "Backspace") {
-                game.backspace()
-            }
-            else if (e.key.length === 1 && isLetter(e.key)) {
-                game.addLetter(e.key.toUpperCase())
-            }
-        })
+        const game = new Game(words, reset, displayPopUp, keyStates);
 
-        reset.addEventListener("click", e => {
-            game.newBoard();
-            game.randomMainWord()
-        })
         for (let layout of ['QWERTYUIOP', 'ASDFGHJKL', '#ZXCVBNM-']) {
             let keyrow = document.createElement("div");
             keyrow.className = "keyrow";
@@ -237,9 +261,37 @@ fetch("words.txt")
                 }
                 keytile.innerText = c;
                 keyrow.appendChild(keytile);
-                game.keyStates[c] = [0, keytile];
+                keyStates[c] = [0, keytile];
             }
             keyboard.appendChild(keyrow);
         }
+
+        for (let row of game.board) {
+            let rowElement = document.createElement("div");
+            rowElement.className = "tilerow"
+            for (let tile of row) {
+                rowElement.appendChild(tile.element);
+            }
+            UI.appendChild(rowElement);
+        }
+        if (typeof screen.orientation !== 'undefined') addEventListener('keyup', e => {
+            if (e.key === "Enter") {
+                game.enter()
+            }
+            else if (e.key === "Backspace") {
+                game.backspace()
+            }
+            else if (e.key.length === 1 && isLetter(e.key)) {
+                game.addLetter(e.key.toUpperCase())
+            }
+        })
+
+        reset.addEventListener("click", e => {
+            game.newBoard();
+            game.randomMainWord()
+        })
+
+        let save = localStorage.getItem('word_list');
+        if (save) game.readSave(save.split(','));
     })
     .catch((e) => console.error(e));

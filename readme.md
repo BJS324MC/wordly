@@ -7,7 +7,9 @@ A simple Wordle recreation. :kekw:
 2. Added win condition.
 3. Shows word upon failure.
 4. Fix bug when keyboard tiles incorrectly turn grey.
+5. Animation upon typing.
+6. Save system.
 
 ### Future Updates
-1. Animation upon typing.
-2. Implement the online system.
+1. Implement the online system.
+2. Dictionary sidebar.

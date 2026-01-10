@@ -4,33 +4,107 @@
 }
 
 
-@keyframes fadeOut{
-    0%{
+@keyframes fadeOut {
+    0% {
         opacity: 0;
     }
-    10%{
+
+    10% {
         opacity: 1;
     }
-    70%{
+
+    70% {
         opacity: 1;
     }
-    100%{
+
+    100% {
         opacity: 0;
     }
 }
 
-@keyframes rainbow{
-    0%{
+@keyframes rainbow {
+    0% {
         background-color: hsl(0, 100%, 50%);
     }
-    33%{
+
+    33% {
         background-color: hsl(120, 100%, 50%);
     }
-    66%{
+
+    66% {
         background-color: hsl(240, 100%, 50%);
     }
-    100%{
+
+    100% {
         background-color: hsl(0, 100%, 50%);
+    }
+}
+
+@keyframes bulge {
+    from {
+        transform: scale(1.1);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes flip {
+    0% {
+        transform: rotateX(0deg);
+        background-color: rgb(63, 63, 63);
+    }
+
+    50% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+@keyframes colorsnap {
+    0% {
+        background-color: rgb(63, 63, 63);
+    }
+
+    100% {
+        background-color: rgb(63, 63, 63);
+    }
+}
+
+@keyframes keycolorsnap {
+    0% {
+        background-color: #616161ff;
+    }
+
+    100% {
+        background-color: #616161ff;
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    85%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-15px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+
+    50%,
+    75% {
+        transform: translateY(5px);
     }
 }
 
@@ -38,11 +112,23 @@
     animation: fadeOut 2s ease-out;
 }
 
-.rainbow{
+.rainbow {
     animation: rainbow 2s infinite;
 }
 
-body{
+.bulge {
+    animation: bulge 0.2s ease-out;
+}
+
+.flip {
+    animation: flip 0.7s ease-in-out, colorsnap 0.35s;
+}
+
+.bounce {
+    animation: flip 0.7s ease-in-out, colorsnap 0.35s, bounce 0.7s ease 1.36s;
+}
+
+body {
     margin: 0;
     padding: 0;
     font-family: DM Sans;
@@ -52,9 +138,10 @@ body{
 #game {
     display: flex;
     flex-direction: column;
+    height: 100vh;
     user-select: none;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-evenly;
     margin: 0;
 }
 
@@ -100,42 +187,58 @@ body{
     font-size: 20pt;
 }
 
-#keyboard{
+@media (min-height: 800px) {
+    .tilerow {
+        width: 250pt;
+        height: 50pt;
+    }
+
+    .tile {
+        width: 40pt;
+        height: 40pt;
+    }
+}
+
+#keyboard {
     display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-.keyrow{
+.keyrow {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
+    width: 100vw;
+    max-width: 300pt;
 }
 
 .keytile {
-    margin:3pt;
+    margin: 3pt;
     display: flex;
-    padding: 0 5pt;
-    width:10pt;
-    height:30pt;
+    padding: 10pt;
+    width: 5pt;
+    height: calc(30pt - 2vw);
+    ;
     font-size: 11pt;
-    font-weight: 600;
+    font-weight: 900;
     justify-content: center;
     align-items: center;
     color: white;
     background-color: #616161ff;
+    border-radius: 10%;
 }
 
 #popup {
     position: absolute;
-    top:15%;
-    left:50%;
+    top: 15%;
+    left: 50%;
     transform: translateX(-50%);
     opacity: 0;
     user-select: none;
     pointer-events: none;
     color: black;
     border-radius: 10%;
-    padding:5pt 10pt;
+    padding: 5pt 10pt;
     background-color: rgba(190, 190, 190, 0.8);
 }
